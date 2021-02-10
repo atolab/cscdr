@@ -9,10 +9,7 @@
 // SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
 //
 using System;
-using System.Diagnostics;
-using System.Collections.Generic;
 using System.Buffers.Binary;
-using System.IO;
 using System.Text;
 
 namespace CSCDR

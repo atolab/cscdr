@@ -9,9 +9,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
 //
 using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Buffers.Binary;
 using System.IO;
 using System.Text;
 
@@ -27,13 +24,13 @@ namespace CSCDR
         /// The 4-bytes DDS SerializedPayloadHeader (that includes the RepresentationIdentifier
         /// and the RepresentationOptions) is automatically written into the buffer by this constructor.
         /// </summary>
-        public CDRWriter() : this(new MemoryStream()) {}
+        public CDRWriter() : this(new MemoryStream()) { }
 
         /// <summary>Initializes a new non-resizable instance based on the specified byte array.
         /// The 4-bytes DDS SerializedPayloadHeader (that includes the RepresentationIdentifier
         /// and the RepresentationOptions) is automatically written into the buffer by this constructor.
         /// </summary>
-        public CDRWriter(byte[] buffer) : this(new MemoryStream(buffer)) {}
+        public CDRWriter(byte[] buffer) : this(new MemoryStream(buffer)) { }
 
         private CDRWriter(MemoryStream stream)
         {
@@ -43,22 +40,23 @@ namespace CSCDR
             // Note: currently only CDR_LE and CDR_BE without representation options are supported
             if (BitConverter.IsLittleEndian)
             {
-                _writer.Write((byte) 0x00);
-                _writer.Write((byte) 0x01);
-                _writer.Write((byte) 0x00);
-                _writer.Write((byte) 0x00);
+                _writer.Write((byte)0x00);
+                _writer.Write((byte)0x01);
+                _writer.Write((byte)0x00);
+                _writer.Write((byte)0x00);
             }
             else
             {
-                _writer.Write((byte) 0x00);
-                _writer.Write((byte) 0x00);
-                _writer.Write((byte) 0x00);
-                _writer.Write((byte) 0x00);
+                _writer.Write((byte)0x00);
+                _writer.Write((byte)0x00);
+                _writer.Write((byte)0x00);
+                _writer.Write((byte)0x00);
             }
         }
 
-        public ReadOnlySpan<Byte> GetBuffer() {
-            return new ReadOnlySpan<Byte>(_stream.GetBuffer(), 0, (int) _stream.Length);
+        public ReadOnlySpan<Byte> GetBuffer()
+        {
+            return new ReadOnlySpan<Byte>(_stream.GetBuffer(), 0, (int)_stream.Length);
         }
 
         public void WriteByte(byte b) => _writer.Write(b);
@@ -69,7 +67,8 @@ namespace CSCDR
         {
             // Note: The 4 starting bytes (for Representation Id and Options) are not considered for alignment
             var modulo = (_writer.BaseStream.Position + 4) % alignment;
-            if (modulo > 0) {
+            if (modulo > 0)
+            {
                 Console.WriteLine("***** align to {0}  pos={1} => modulo={2} => add {3}", alignment, _writer.BaseStream.Position, modulo, alignment - modulo);
                 for (int i = 0; i < alignment - modulo; i++)
                 {
@@ -80,51 +79,60 @@ namespace CSCDR
 
         public void WriteBool(bool b) => WriteByte(b ? (byte)0x01 : (byte)0x00);
 
-        public void WriteInt16(short s) {
+        public void WriteInt16(short s)
+        {
             Align(2);
             _writer.Write(s);
         }
 
-        public void WriteUInt16(ushort s) {
+        public void WriteUInt16(ushort s)
+        {
             Align(2);
             _writer.Write(s);
         }
 
-        public void WriteInt32(int i) {
+        public void WriteInt32(int i)
+        {
             Align(4);
             _writer.Write(i);
         }
 
-        public void WriteUInt32(uint i) {
+        public void WriteUInt32(uint i)
+        {
             Align(4);
             _writer.Write(i);
         }
 
-        public void WriteInt64(long l) {
+        public void WriteInt64(long l)
+        {
             Align(8);
             _writer.Write(l);
         }
 
-        public void WriteUInt64(ulong l) {
+        public void WriteUInt64(ulong l)
+        {
             Align(8);
             _writer.Write(l);
         }
 
-        public void WriteSingle(float f) {
+        public void WriteSingle(float f)
+        {
             Align(4);
             _writer.Write(f);
         }
 
-        public void WriteDouble(double d) {
+        public void WriteDouble(double d)
+        {
             Align(8);
             _writer.Write(d);
         }
 
         public void WriteChar(char c) => _writer.Write(Convert.ToByte(c));
 
-        public void WriteString(String s) {
+        public void WriteString(String s)
+        {
             // Note: Add null-termination char as not present in C# String
-            WriteUInt32((uint) s.Length +1);
+            WriteUInt32((uint)s.Length + 1);
             WriteBytes(Encoding.UTF8.GetBytes(s));
             WriteByte(0x00);
         }
